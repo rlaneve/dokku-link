@@ -33,7 +33,7 @@ The above example will result in the following arguments being passed to docker 
 -link pgsql:db
 ````
 
-More information on docker volumes can be found here: http://docs.docker.io/en/latest/use/working_with_links_names/
+More information on docker links can be found here: http://docs.docker.io/en/latest/use/working_with_links_names/
 
 License
 -------
