@@ -44,6 +44,7 @@ $ dokku help
     link:delete <app> NAME [ALIAS]                  delete a link for an app
 ```
 
+After creating or deleting a link you must redeploy the app.
 
 License
 -------

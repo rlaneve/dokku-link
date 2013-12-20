@@ -50,15 +50,11 @@ case "$1" in
       ALIAS="$4"
     fi
 
-    RESTART=false
     VAR="${NAME}:${ALIAS}"
-
     echo "-----> Linking $VAR with $APP"
     echo "$VAR" >> $LINK_FILE
     LINK_TEMP=`cat $LINK_FILE`
     echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
-    echo
-    echo "Please deploy $APP to enable link: dokku deploy $APP"
   ;;
 
   link:delete)
@@ -75,12 +71,11 @@ case "$1" in
       ALIAS="$4"
     fi
 
-    echo "-----> Unlinking $NAME:$ALIAS and restarting $APP"
+    VAR="${NAME}:${ALIAS}"
+    echo "-----> Unlinking $VAR from $APP"
     LINK_TEMP=`cat "${LINK_FILE}"`
-    LINK_TEMP=$(echo -e "${LINK_TEMP}" | sed "s/${NAME}:${ALIAS}//")
+    LINK_TEMP=$(echo -e "${LINK_TEMP}" | sed "s/${VAR}//")
     echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
-    echo
-    echo "Please deploy $APP to disable link: dokku deploy $APP"
   ;;
 
   help)
