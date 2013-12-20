@@ -23,17 +23,6 @@ if [[ $1 == link ]] || [[ $1 == link:* ]]; then
   fi
 fi
 
-link_restart_app() {
-  APP="$1"; IMAGE="app/$APP"
-
-  echo "-----> Releasing $APP ..."
-  dokku release $APP $IMAGE
-  echo "-----> Release complete!"
-  echo "-----> Deploying $APP ..."
-  dokku deploy $APP $IMAGE
-  echo "-----> Deploy complete!"
-}
-
 case "$1" in
   link)
     APP="$2"
@@ -64,17 +53,12 @@ case "$1" in
     RESTART=false
     VAR="${NAME}:${ALIAS}"
 
-    if [[ $NAME == [a-zA-Z_][a-zA-Z0-9_]* && $ALIAS == [a-zA-Z_][a-zA-Z0-9_]* ]]; then
-      RESTART_APP=true
-      echo "$VAR" >> $LINK_FILE
-      LINK_TEMP=`cat $LINK_FILE`
-    fi
-
-    if [ $RESTART_APP ]; then
-      echo "-----> Linking and restarting $APP"
-      echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
-      link_restart_app $APP
-    fi
+    echo "-----> Linking $VAR with $APP"
+    echo "$VAR" >> $LINK_FILE
+    LINK_TEMP=`cat $LINK_FILE`
+    echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
+    echo
+    echo "Please deploy $APP to enable link: dokku deploy $APP"
   ;;
 
   link:delete)
@@ -91,11 +75,12 @@ case "$1" in
       ALIAS="$4"
     fi
 
-    echo "-----> Unlinking $var and restarting $APP"
+    echo "-----> Unlinking $NAME:$ALIAS and restarting $APP"
     LINK_TEMP=`cat "${LINK_FILE}"`
     LINK_TEMP=$(echo -e "${LINK_TEMP}" | sed "s/${NAME}:${ALIAS}//")
     echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
-    link_restart_app $APP
+    echo
+    echo "Please deploy $APP to disable link: dokku deploy $APP"
   ;;
 
   help)
