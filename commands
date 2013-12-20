@@ -47,10 +47,10 @@ case "$1" in
     cat $LINK_FILE
   ;;
 
-  link:link)
+  link:create)
     if [[ -z "${*:3}" ]]; then
-      echo "Usage: dokku link:link APP NAME [ALIAS]"
-      echo "Must specify NAME to set."
+      echo "Usage: dokku link:create APP NAME [ALIAS]"
+      echo "Must specify NAME to create."
       exit 1
     fi
 
@@ -77,10 +77,10 @@ case "$1" in
     fi
   ;;
 
-  link:unlink)
+  link:delete)
     if [[ -z $3 ]]; then
-      echo "Usage: dokku link:unlink APP NAME [ALIAS]"
-      echo "Must specify NAME to unlink."
+      echo "Usage: dokku link:delete APP NAME [ALIAS]"
+      echo "Must specify NAME to delete."
       exit 1
     fi
 
@@ -101,8 +101,8 @@ case "$1" in
   help)
     cat && cat<<EOF
     link <app>                                      display links for an app
-    link:create <app> NAME:ALIAS                    create a link for an app
-    link:delete <app> NAME:ALIAS                    delete a link for an app
+    link:create <app> NAME [ALIAS]                  create a link for an app
+    link:delete <app> NAME [ALIAS]                  delete a link for an app
 EOF
   ;;
 
