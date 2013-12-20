@@ -35,6 +35,16 @@ The above example will result in the following arguments being passed to docker 
 
 More information on docker links can be found here: http://docs.docker.io/en/latest/use/working_with_links_names/
 
+Commands
+--------
+```
+$ dokku help
+    link <app>                                      display links for an app
+    link:create <app> NAME [ALIAS]                  create a link for an app
+    link:delete <app> NAME [ALIAS]                  delete a link for an app
+```
+
+
 License
 -------
 
