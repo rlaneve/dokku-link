@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+# Check if name is specified
+if [[ $1 == link ]] || [[ $1 == link:* ]]; then
+  if [[ -z $2 ]]; then
+    echo "You must specify an app name"
+    exit 1
+  else
+    APP="$2"
+    LINK_FILE="$DOKKU_ROOT/$APP/LINK"
+
+    # Check if app exists with the same name
+    if [ ! -d "$DOKKU_ROOT/$APP" ]; then
+      echo "App $APP does not exist"
+      exit 1
+    fi
+
+    [ -f $LINK_FILE ] || {
+      echo "-----> Creating $LINK_FILE"
+      touch $LINK_FILE
+    }
+  fi
+fi
+
+link_restart_app() {
+  APP="$1"; IMAGE="app/$APP"
+
+  echo "-----> Releasing $APP ..."
+  dokku release $APP $IMAGE
+  echo "-----> Release complete!"
+  echo "-----> Deploying $APP ..."
+  dokku deploy $APP $IMAGE
+  echo "-----> Deploy complete!"
+}
+
+case "$1" in
+  link)
+    APP="$2"
+
+    if [ ! -f $LINK_FILE ] || [ ! -s $LINK_FILE ] ; then
+      echo "$APP has no links"
+      exit 1
+    fi
+
+    echo "=== $APP links ==="
+    cat $LINK_FILE
+  ;;
+
+  link:link)
+    if [[ -z "${*:3}" ]]; then
+      echo "Usage: dokku link:link APP NAME [ALIAS]"
+      echo "Must specify NAME to set."
+      exit 1
+    fi
+
+    NAME="$3"
+    if [[ -z $4 ]]; then
+      ALIAS="$NAME"
+    else
+      ALIAS="$4"
+    fi
+
+    RESTART=false
+    VAR="${NAME}:${ALIAS}"
+
+    if [[ $NAME == [a-zA-Z_][a-zA-Z0-9_]* && $ALIAS == [a-zA-Z_][a-zA-Z0-9_]* ]]; then
+      RESTART_APP=true
+      echo "$VAR" >> $LINK_FILE
+      LINK_TEMP=`cat $LINK_FILE`
+    fi
+
+    if [ $RESTART_APP ]; then
+      echo "-----> Linking and restarting $APP"
+      echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
+      link_restart_app $APP
+    fi
+  ;;
+
+  link:unlink)
+    if [[ -z $3 ]]; then
+      echo "Usage: dokku link:unlink APP NAME [ALIAS]"
+      echo "Must specify NAME to unlink."
+      exit 1
+    fi
+
+    NAME="$3"
+    if [[ -z $4 ]]; then
+      ALIAS="$NAME"
+    else
+      ALIAS="$4"
+    fi
+
+    echo "-----> Unlinking $var and restarting $APP"
+    LINK_TEMP=`cat "${LINK_FILE}"`
+    LINK_TEMP=$(echo -e "${LINK_TEMP}" | sed "s/${NAME}:${ALIAS}//")
+    echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
+    link_restart_app $APP
+  ;;
+
+  help)
+    cat && cat<<EOF
+    link <app>                                      display links for an app
+    link:create <app> NAME:ALIAS                    create a link for an app
+    link:delete <app> NAME:ALIAS                    delete a link for an app
+EOF
+  ;;
+
+esac
