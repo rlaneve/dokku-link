@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
+
+# Check if name is specified
+if [[ $1 == link ]] || [[ $1 == link:* ]]; then
+  if [[ -z $2 ]]; then
+    echo "You must specify an app name"
+    exit 1
+  else
+    APP="$2"
+    LINK_FILE="$DOKKU_ROOT/$APP/LINK"
+
+    # Check if app exists with the same name
+    if [ ! -d "$DOKKU_ROOT/$APP" ]; then
+      echo "App $APP does not exist"
+      exit 1
+    fi
+
+    [ -f $LINK_FILE ] || {
+      echo "-----> Creating $LINK_FILE"
+      touch $LINK_FILE
+    }
+  fi
+fi
+
+case "$1" in
+  link)
+    APP="$2"
+
+    if [ ! -f $LINK_FILE ] || [ ! -s $LINK_FILE ] ; then
+      echo "$APP has no links"
+      exit 1
+    fi
+
+    echo "=== $APP links ==="
+    cat $LINK_FILE
+  ;;
+
+  link:create)
+    if [[ -z "${*:3}" ]]; then
+      echo "Usage: dokku link:create APP NAME [ALIAS]"
+      echo "Must specify NAME to create."
+      exit 1
+    fi
+
+    NAME="$3"
+    if [[ -z $4 ]]; then
+      ALIAS="$NAME"
+    else
+      ALIAS="$4"
+    fi
+
+    VAR="${NAME}:${ALIAS}"
+    echo "-----> Linking $VAR with $APP"
+    echo "$VAR" >> $LINK_FILE
+    LINK_TEMP=`cat $LINK_FILE`
+    echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
+  ;;
+
+  link:delete)
+    if [[ -z $3 ]]; then
+      echo "Usage: dokku link:delete APP NAME [ALIAS]"
+      echo "Must specify NAME to delete."
+      exit 1
+    fi
+
+    NAME="$3"
+    if [[ -z $4 ]]; then
+      ALIAS="$NAME"
+    else
+      ALIAS="$4"
+    fi
+
+    VAR="${NAME}:${ALIAS}"
+    echo "-----> Unlinking $VAR from $APP"
+    LINK_TEMP=`cat "${LINK_FILE}"`
+    LINK_TEMP=$(echo -e "${LINK_TEMP}" | sed "s/${VAR}//")
+    echo -e "$LINK_TEMP" | sed '/^$/d' | sort -u > $LINK_FILE
+  ;;
+
+  help)
+    cat && cat<<EOF
+    link <app>                                      display links for an app
+    link:create <app> NAME [ALIAS]                  create a link for an app
+    link:delete <app> NAME [ALIAS]                  delete a link for an app
+EOF
+  ;;
+
+esac
