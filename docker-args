@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail; [[ $DOKKU_TRACE ]] && set -x
 
+STDIN=$(cat)
 APP="$1"
 LINK_FILE="LINK"
 LINK_FILE_PATH="$DOKKU_ROOT/$APP/$LINK_FILE"
@@ -11,5 +12,5 @@ if [[ -f "$LINK_FILE_PATH" ]]; then
     output="$output -link $line"
   done < $LINK_FILE_PATH
 
-  echo "$output"
+  echo "$STDIN$output"
 fi
