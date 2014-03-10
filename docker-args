@@ -11,6 +11,5 @@ if [[ -f "$LINK_FILE_PATH" ]]; then
   do
     output="$output -link $line"
   done < $LINK_FILE_PATH
-
-  echo "$STDIN$output"
 fi
+echo "$STDIN$output"
