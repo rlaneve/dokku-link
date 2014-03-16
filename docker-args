@@ -10,7 +10,7 @@ output=""
 if [[ -f "$LINK_FILE_PATH" ]]; then
   while read line
   do
-    output="$output -link $line"
+    output="$output --link $line"
   done < $LINK_FILE_PATH
 fi
 echo "$STDIN$output"
