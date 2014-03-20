@@ -3,7 +3,7 @@ dokku-link
 
 Basic docker link plugin for dokku (https://github.com/progrium/dokku)
 
-For a more useful dokku plugin, which will also handle persistent storage, check out dokku-docker-options (https://github.com/dyson/dokku-docker-options).
+For a more useful dokku plugin, which will also handle docker links, check out dokku-docker-options (https://github.com/dyson/dokku-docker-options).
 
 Requirements
 ------------
