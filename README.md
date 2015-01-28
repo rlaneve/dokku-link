@@ -32,7 +32,7 @@ pgsql:db
 The above example will result in the following arguments being passed to docker during deploy and docker run:
 
 ````
--link pgsql:db
+--link pgsql:db
 ````
 
 More information on docker links can be found here: http://docs.docker.io/en/latest/use/working_with_links_names/
