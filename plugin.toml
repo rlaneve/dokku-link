@@ -1,0 +1,5 @@
+[plugin]
+description = "Basic docker link plugin for dokku"
+version = "0.0.0"
+[plugin.config]
+
