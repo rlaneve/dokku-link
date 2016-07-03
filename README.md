@@ -1,3 +1,5 @@
+# This repository is no longer maintained.
+
 dokku-link
 ==========
 
